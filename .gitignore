@@ -1,0 +1,8 @@
+
+.env
+Artifacts/
+final_model/
+logs/
+prdiction_output/
+StokePrediction_data/
+valid_data/

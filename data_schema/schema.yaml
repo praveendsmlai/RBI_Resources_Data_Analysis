@@ -1,0 +1,9 @@
+columns:
+  - Fortnight Ended: object
+  - Non-food Bank Credit: object
+  - Investments in Commercial Paper: object
+  - Investments in shares : object
+  - Investments in Bonds/Debentures: object
+  - Total Non-SLR Investments: object
+  - Adjusted Non-food Bank Credit: object
+  -   Y-o-Y Growth in (7) (%): float64
