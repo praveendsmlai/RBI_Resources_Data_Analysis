@@ -41,12 +41,27 @@ class DataTransformation:
     def feature_engineering(self,df):
         df = df.copy()
 
-
-        df = df.drop(index=0,axis=0)
         df=df.drop(columns=["Unnamed: 0"],axis=1)
-        df = df.drop(columns=["Fortnight Ended"],axis=0)
+        df = df.drop(columns=["Fortnight Ended"],axis=1)
 
-        df["All Investments"] = df["Investments in Commercial Paper"]+df["Investments in shares"]+df["Investments in Bonds/Debentures"]+df["Total Non-SLR Investments"]
+        investment_columns = [
+            "Investments in Commercial Paper",
+            "Investments in shares",
+            "Investments in Bonds/Debentures",
+            "Total Non-SLR Investments"
+            ]
+
+        for col in investment_columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        df["All Investments"] = (
+        df["Investments in Commercial Paper"] +
+        df["Investments in shares"] +
+        df["Investments in Bonds/Debentures"] +
+        df["Total Non-SLR Investments"]
+        )
+
+        
 
         df=df.drop(columns=["Investments in Commercial Paper","Investments in shares","Investments in Bonds/Debentures","Total Non-SLR Investments"])
 
@@ -66,26 +81,26 @@ class DataTransformation:
                 # Numerical Pipeline
              # -------------------------
             
-            num_pipeline = Pipeline([
-                ("imputer", SimpleImputer(strategy="median"))
-                #("scaler",StandardScaler())
-            ])
-
-                # -------------------------
-                    # Categorical Pipeline
-                # -------------------------
-            # cat_pipeline = Pipeline([
-            #     ("imputer", SimpleImputer(strategy="most_frequent")),
-            #     ("onehot", OneHotEncoder(drop="first", handle_unknown="ignore"))
+            # num_pipeline = Pipeline([
+            #     ("imputer", SimpleImputer(strategy="median"))
+            #     #("scaler",StandardScaler())
             # ])
 
-                # -------------------------
-                    # Column Transformer
-                # -------------------------
-            preprocessor = ColumnTransformer([
-                ("num", num_pipeline, NUM_COLUMNS)
-                #("cat", cat_pipeline, CAT_COLUMNS)
-            ])
+            #     # -------------------------
+            #         # Categorical Pipeline
+            #     # -------------------------
+            # # cat_pipeline = Pipeline([
+            # #     ("imputer", SimpleImputer(strategy="most_frequent")),
+            # #     ("onehot", OneHotEncoder(drop="first", handle_unknown="ignore"))
+            # # ])
+
+            #     # -------------------------
+            #         # Column Transformer
+            #     # -------------------------
+            # preprocessor = ColumnTransformer([
+            #     ("num", num_pipeline, NUM_COLUMNS)
+            #     #("cat", cat_pipeline, CAT_COLUMNS)
+            # ])
 
             feature_transformer = FunctionTransformer(self.feature_engineering,validate=False)
 
@@ -93,11 +108,6 @@ class DataTransformation:
                 (
                     "feature_engineering",
                     feature_transformer
-                ),
-
-                (
-                    "preprocessing",
-                    preprocessor
                 )
             ])
 
@@ -119,12 +129,10 @@ class DataTransformation:
             ## training dataframe
             input_feature_train_df=train_df.drop(columns=[TARGET_COLUMN],axis=1)
             target_feature_train_df = train_df[TARGET_COLUMN]
-            target_feature_train_df = np.log1p(target_feature_train_df)
 
             #testing dataframe
             input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN], axis=1)
             target_feature_test_df = test_df[TARGET_COLUMN]
-            target_feature_test_df = np.log1p(target_feature_test_df)
 
             preprocessor=self.get_data_transformer_object()
 
@@ -132,11 +140,12 @@ class DataTransformation:
             transformed_input_train_feature=preprocessor.fit_transform(input_feature_train_df)
             transformed_input_test_feature =preprocessor.transform(input_feature_test_df)
 
-            print(type(transformed_input_train_feature))
-            print(transformed_input_train_feature.shape)
+          
+            print(f"Input Train Shape:{transformed_input_train_feature.shape}")
+            print(f"Output Train Shape:{target_feature_train_df.shape}")
 
-            print(type(target_feature_train_df))
-            print(target_feature_train_df.shape)
+            print(f"Input Test Shape:{transformed_input_test_feature.shape}")
+            print(f"Output Train Shape:{target_feature_test_df.shape}")
              
 
             train_arr = np.c_[transformed_input_train_feature, np.array(target_feature_train_df) ]

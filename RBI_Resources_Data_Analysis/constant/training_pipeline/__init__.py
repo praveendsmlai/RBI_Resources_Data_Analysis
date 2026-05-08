@@ -6,7 +6,7 @@ import pandas as pd
 """
 defining common constant variable for training pipeline
 """
-TARGET_COLUMN = "Y-o-Y Growth in (7) (%)"
+TARGET_COLUMN = " Y-o-Y Growth in (7) (%)"
 PIPELINE_NAME: str = "RBI_Resources_Data_Analysis"
 ARTIFACT_DIR: str = "Artifacts"
 FILE_NAME: str = "RBI_Resources_Data_Analysis.xlsx"

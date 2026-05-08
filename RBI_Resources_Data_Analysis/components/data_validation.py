@@ -54,8 +54,12 @@ class DataValidation:
             status=True
             report={}
             for column in base_df.columns:
-                d1=base_df[column]
-                d2=current_df[column]
+                d1 = pd.to_numeric(base_df[column], errors='coerce')
+                d2 = pd.to_numeric(current_df[column], errors='coerce')
+
+                d1 = d1.dropna()
+                d2 = d2.dropna()
+                
                 is_same_dist=ks_2samp(d1,d2)
                 if threshold<=is_same_dist.pvalue:
                     is_found=False
